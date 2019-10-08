@@ -11,6 +11,9 @@ eval $(cat /tmp/anykernel/props | grep -v '\.')
 ## AnyKernel install
 dump_boot;
 
+# Use the provided dtb
+mv /tmp/anykernel/dtb /tmp/anykernel/split_img/;
+
 # Install the boot image
 write_boot;
 
