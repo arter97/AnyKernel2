@@ -20,7 +20,9 @@ eval $(cat $home/props | grep -v '\.')
 dump_boot;
 
 # Use the provided dtb
-mv $home/dtb $home/split_img/;
+if [ -e $home/dtb ]; then
+  mv $home/dtb $home/split_img/;
+fi
 
 # Install the boot image
 write_boot;
