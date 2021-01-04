@@ -77,6 +77,13 @@ split_boot() {
 
   mkdir -p $split_img;
   cd $split_img;
+
+  # Use the provided dtb
+  if [ -e $home/dtb ]; then
+    echo "Moving $home/*dtb to split_img";
+    mv $home/*dtb .;
+  fi
+
   if [ -f "$bin/unpackelf" ] && $bin/unpackelf -i $bootimg -h -q 2>/dev/null; then
     if [ -f "$bin/elftool" ]; then
       mkdir elftool_out;
@@ -124,6 +131,12 @@ split_boot() {
       2) touch chromeos;;
     esac;
   fi;
+
+  cat kernel kernel_dtb 2>/dev/null | grep -q "$alt_dtb_match";
+  test $? == 0 && use_alt_dtb=1;
+  if [[ "$use_alt_dtb" == "1" ]]; then
+    ui_print "$alt_dtb_msg";
+  fi
 
   if [ $? != 0 -o "$dumpfail" ]; then
     abort "Dumping/splitting image failed. Aborting...";
@@ -301,6 +314,11 @@ flash_boot() {
     test "$kernel" && cp -f $kernel kernel;
     test "$ramdisk" && cp -f $ramdisk ramdisk.cpio;
     test "$dt" -a -f extra && cp -f $dt extra;
+    if [[ "$use_alt_dtb" == "1" ]]; then
+      mv alt_dtb dtb
+    else
+      rm -f alt_dtb
+    fi
     for i in dtb recovery_dtbo; do
       test "$(eval echo \$$i)" -a -f $i && cp -f $(eval echo \$$i) $i;
     done;
