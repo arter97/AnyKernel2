@@ -319,6 +319,7 @@ flash_boot() {
     else
       rm -f alt_dtb
     fi
+    cat dtb >> kernel
     for i in dtb recovery_dtbo; do
       test "$(eval echo \$$i)" -a -f $i && cp -f $(eval echo \$$i) $i;
     done;
